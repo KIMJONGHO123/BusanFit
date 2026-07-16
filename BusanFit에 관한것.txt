@@ -1,0 +1,24 @@
+features/
+├─ auth/          # 로그인
+├─ home/          # 메인 화면
+├─ planner/       # 일정 작성
+├─ place/         # 관광지 검색 및 선택
+├─ activity/      # 활동 선택
+├─ feasibility/   # 일정 가능 여부 진단
+├─ map/           # 지도와 경로
+└─ schedule/      # 저장된 일정
+
+
+
+screens	화면 한 장
+components	화면을 구성하는 작은 부품
+api	서버 요청
+hooks	서버 요청을 React에서 사용하기 쉽게 감싼 코드
+store	앱에서 임시로 유지할 데이터
+types	데이터 모양 정의
+constants	고정된 값
+
+
+내가 작성 중인 값       → Zustand
+서버에서 받아온 값      → TanStack Query
+화면에서 잠깐 쓰는 값   → useState
