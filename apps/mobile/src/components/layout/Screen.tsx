@@ -2,6 +2,7 @@ import { PropsWithChildren } from 'react';
 import { ScrollView, StyleSheet, View, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { BottomNavigation, bottomNavigationHeight } from '@/components/layout/BottomNavigation';
 import { colors, spacing } from '@/theme';
 
 type ScreenProps = PropsWithChildren<{
@@ -15,17 +16,21 @@ export function Screen({ children, scroll = false, contentContainerStyle }: Scre
       <SafeAreaView style={styles.safeArea}>
         <ScrollView
           style={styles.scroll}
-          contentContainerStyle={[styles.content, contentContainerStyle]}
+          contentContainerStyle={[styles.content, styles.withBottomNavigation, contentContainerStyle]}
           showsVerticalScrollIndicator={false}>
           {children}
         </ScrollView>
+        <BottomNavigation />
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={[styles.content, styles.flex, contentContainerStyle]}>{children}</View>
+      <View style={[styles.content, styles.flex, styles.withBottomNavigation, contentContainerStyle]}>
+        {children}
+      </View>
+      <BottomNavigation />
     </SafeAreaView>
   );
 }
@@ -41,6 +46,9 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
+  },
+  withBottomNavigation: {
+    paddingBottom: bottomNavigationHeight + spacing.md,
   },
   flex: {
     flex: 1,

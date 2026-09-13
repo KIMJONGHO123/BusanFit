@@ -1,7 +1,7 @@
 // 일정 작성 중 화면 간에 유지해야 하는 입력 상태를 관리하는 Zustand store입니다.
 import { create } from 'zustand';
 
-import type { Place, SelectedPlace, TripCondition } from './types';
+import type { Place, PlaceActivity, SelectedPlace, TripCondition } from './types';
 
 // PlannerState: 여행 조건과 선택 관광지, 상태 변경 함수를 묶은 store 타입입니다.
 type PlannerState = {
@@ -16,6 +16,7 @@ type PlannerState = {
     longitude?: number;
   }) => void;
   addPlace: (place: Place) => void;
+  setPlaceActivities: (place: Place, activities: PlaceActivity[]) => void;
   removePlace: (placeId: string) => void;
   resetPlanner: () => void;
 };
@@ -23,8 +24,8 @@ type PlannerState = {
 // initialCondition: 사용자가 아직 아무 조건도 입력하지 않은 기본 상태입니다.
 const initialCondition: TripCondition = {
   travelDate: '',
-  startTime: '',
-  endTime: '',
+  startTime: '08:00',
+  endTime: '17:00',
   departureName: '',
 };
 
@@ -88,11 +89,39 @@ export const usePlannerStore = create<PlannerState>((set) => ({
         latitude: place.latitude,
         longitude: place.longitude,
         stayMinutes: place.estimatedStayMinutes,
+        activities: [],
         order: state.selectedPlaces.length + 1,
       };
 
       return {
         selectedPlaces: [...state.selectedPlaces, selectedPlace],
+      };
+    }),
+  setPlaceActivities: (place, activities) =>
+    set((state) => {
+      const selectedPlace = state.selectedPlaces.find((item) => item.placeId === place.id);
+
+      if (selectedPlace) {
+        return {
+          selectedPlaces: state.selectedPlaces.map((item) =>
+            item.placeId === place.id ? { ...item, activities } : item,
+          ),
+        };
+      }
+
+      return {
+        selectedPlaces: [
+          ...state.selectedPlaces,
+          {
+            placeId: place.id,
+            name: place.name,
+            latitude: place.latitude,
+            longitude: place.longitude,
+            stayMinutes: place.estimatedStayMinutes,
+            activities,
+            order: state.selectedPlaces.length + 1,
+          },
+        ],
       };
     }),
   removePlace: (placeId) =>
@@ -101,8 +130,9 @@ export const usePlannerStore = create<PlannerState>((set) => ({
         state.selectedPlaces.filter((place) => place.placeId !== placeId),
       ),
     })),
-  resetPlanner: () => ({
-    condition: initialCondition,
-    selectedPlaces: [],
-  }),
+  resetPlanner: () =>
+    set({
+      condition: initialCondition,
+      selectedPlaces: [],
+    }),
 }));

@@ -1,8 +1,11 @@
 import { Href, router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { searchPlaces } from '@/api/places';
+import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import type { Place } from '@/features/planner/types';
 import { usePlannerStore } from '@/features/planner/store';
 import { mockPlaces } from '@/mocks/places';
@@ -45,21 +48,11 @@ export default function PlannerPlacesPage() {
   const addPlace = usePlannerStore((state) => state.addPlace);
   const removePlace = usePlannerStore((state) => state.removePlace);
 
-  const filteredPlaces = useMemo(() => {
-    const normalizedKeyword = keyword.trim().toLowerCase();
-
-    if (!normalizedKeyword) {
-      return mockPlaces;
-    }
-
-    return mockPlaces.filter((place) => {
-      const view = getPlaceView(place);
-      return (
-        place.name.toLowerCase().includes(normalizedKeyword) ||
-        view.name.toLowerCase().includes(normalizedKeyword)
-      );
-    });
-  }, [keyword]);
+  const placesQuery = useQuery({
+    queryKey: ['places', keyword.trim()],
+    queryFn: () => searchPlaces(keyword.trim()),
+  });
+  const filteredPlaces = placesQuery.data?.length ? placesQuery.data : mockPlaces;
 
   const handleDiagnose = () => {
     if (selectedPlaces.length === 0) {
@@ -86,7 +79,7 @@ export default function PlannerPlacesPage() {
 
       <ScrollView
         className="flex-1"
-        contentContainerClassName="px-5 pb-40 pt-6"
+        contentContainerClassName="px-5 pb-56 pt-6"
         keyboardShouldPersistTaps="handled">
         <View className="rounded-[24px] bg-white px-5 pb-6 pt-4 shadow-sm">
           <View className="mx-auto mb-5 h-1 w-12 rounded-full bg-slate-200" />
@@ -102,6 +95,15 @@ export default function PlannerPlacesPage() {
               onChangeText={setKeyword}
             />
           </View>
+
+          {placesQuery.isFetching ? (
+            <Text className="mt-4 text-xs font-semibold text-slate-400">관광지 정보를 불러오는 중입니다.</Text>
+          ) : null}
+          {placesQuery.isError ? (
+            <Text className="mt-4 text-xs font-semibold text-red-500">
+              관광지 API를 불러오지 못해 임시 목록을 표시합니다.
+            </Text>
+          ) : null}
 
           <View className="mt-5 gap-3">
             {filteredPlaces.map((place) => {
@@ -174,7 +176,7 @@ export default function PlannerPlacesPage() {
         </View>
       </ScrollView>
 
-      <View className="absolute bottom-0 left-0 right-0 bg-white px-6 pb-6 pt-4">
+      <View className="absolute bottom-[82px] left-0 right-0 bg-white px-6 pb-4 pt-4">
         <Pressable
           accessibilityRole="button"
           className="h-14 items-center justify-center rounded-xl bg-busan-blue shadow-lg shadow-blue-200"
@@ -182,6 +184,7 @@ export default function PlannerPlacesPage() {
           <Text className="text-lg font-black text-white">일정 진단하기</Text>
         </Pressable>
       </View>
+      <BottomNavigation />
     </SafeAreaView>
   );
 }

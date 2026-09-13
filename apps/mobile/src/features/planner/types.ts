@@ -12,6 +12,24 @@ export type Place = {
   estimatedStayMinutes: number;
 };
 
+export type ActivityId =
+  | 'cafe'
+  | 'meal'
+  | 'shopping'
+  | 'photo'
+  | 'walk'
+  | 'viewing'
+  | 'experience'
+  | 'nightView'
+  | 'rest'
+  | 'other';
+
+export type PlaceActivity = {
+  id: ActivityId;
+  name: string;
+  minutes: number;
+};
+
 // TripCondition: 사용자가 입력한 여행 날짜, 시간, 출발지 조건입니다.
 export type TripCondition = {
   travelDate: string;
@@ -29,6 +47,7 @@ export type SelectedPlace = {
   latitude: number;
   longitude: number;
   stayMinutes: number;
+  activities: PlaceActivity[];
   order: number;
 };
 
@@ -40,6 +59,8 @@ export type ScheduleItem = {
   arrivalTime: string;
   departureTime: string;
   stayMinutes: number;
+  activities: PlaceActivity[];
+  activityMinutes: number;
   travelMinutesFromPrevious: number;
 };
 

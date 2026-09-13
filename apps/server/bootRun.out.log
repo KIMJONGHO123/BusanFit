@@ -1,0 +1,61 @@
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :resolveMainClassName
+
+> Task :bootRun
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.0)
+
+2026-09-13T00:26:56.170+09:00  INFO 22564 --- [demo] [           main] com.busanfit.BusanfitApplication         : Starting BusanfitApplication using Java 21.0.11 with PID 22564 (C:\BusanFit\apps\server\build\classes\java\main started by user in C:\BusanFit\apps\server)
+2026-09-13T00:26:56.173+09:00  INFO 22564 --- [demo] [           main] com.busanfit.BusanfitApplication         : No active profile set, falling back to 1 default profile: "default"
+2026-09-13T00:26:56.653+09:00  INFO 22564 --- [demo] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-09-13T00:26:56.695+09:00  INFO 22564 --- [demo] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 36 ms. Found 1 JPA repository interface.
+2026-09-13T00:26:57.096+09:00  INFO 22564 --- [demo] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-09-13T00:26:57.107+09:00  INFO 22564 --- [demo] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-09-13T00:26:57.107+09:00  INFO 22564 --- [demo] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-09-13T00:26:57.146+09:00  INFO 22564 --- [demo] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 934 ms
+2026-09-13T00:26:57.285+09:00  INFO 22564 --- [demo] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-09-13T00:26:57.322+09:00  INFO 22564 --- [demo] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.1.Final
+2026-09-13T00:26:57.620+09:00  INFO 22564 --- [demo] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-09-13T00:26:57.644+09:00  INFO 22564 --- [demo] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-09-13T00:26:57.874+09:00  INFO 22564 --- [demo] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5a06eeef
+2026-09-13T00:26:57.876+09:00  INFO 22564 --- [demo] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-09-13T00:26:57.917+09:00  WARN 22564 --- [demo] [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-09-13T00:26:57.930+09:00  INFO 22564 --- [demo] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://127.0.0.1:3306/busanfit?serverTimezone=Asia/Seoul&characterEncoding=UTF-8]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.46
+	Default catalog/schema: busanfit/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-09-13T00:26:58.587+09:00  INFO 22564 --- [demo] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-09-13T00:26:58.650+09:00  INFO 22564 --- [demo] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-09-13T00:26:58.746+09:00  INFO 22564 --- [demo] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-09-13T00:26:58.939+09:00  WARN 22564 --- [demo] [           main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: f228e3e5-d27f-4274-8dd4-283098f03197
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-09-13T00:26:58.944+09:00  INFO 22564 --- [demo] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-09-13T00:26:59.266+09:00  INFO 22564 --- [demo] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-09-13T00:26:59.272+09:00  INFO 22564 --- [demo] [           main] com.busanfit.BusanfitApplication         : Started BusanfitApplication in 3.476 seconds (process running for 3.762)
+2026-09-13T00:27:26.364+09:00  INFO 22564 --- [demo] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-09-13T00:27:26.364+09:00  INFO 22564 --- [demo] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-09-13T00:27:26.366+09:00  INFO 22564 --- [demo] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+
+> Task :bootRun FAILED
+4 actionable tasks: 2 executed, 2 up-to-date

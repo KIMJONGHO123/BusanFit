@@ -22,3 +22,11 @@ constants	고정된 값
 내가 작성 중인 값       → Zustand
 서버에서 받아온 값      → TanStack Query
 화면에서 잠깐 쓰는 값   → useState
+
+진단 버튼 클릭
+→ TanStack Query의 mutation 또는 query로 백엔드 호출
+→ 백엔드가 TourAPI / TMAP / 기상청 호출
+→ 진단 결과 생성
+→ 프론트로 반환
+→ TanStack Query가 응답 결과를 캐시에 보관
+→ 결과 화면 표시

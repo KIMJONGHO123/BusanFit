@@ -1,0 +1,31 @@
+APP_NAME: busanfit-local
+
+DB_URL: jdbc:mysql://127.0.0.1:3306/busanfit?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+DB_USERNAME: root
+DB_PASSWORD: your_mysql_password
+DB_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+
+JPA_OPEN_IN_VIEW: false
+JPA_DDL_AUTO: update
+HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+HIBERNATE_FORMAT_SQL: true
+
+SQL_INIT_MODE: never
+
+# 실제 키는 application-env.yaml에만 적고, 이 예시 파일에는 적지 않습니다.
+PUBLIC_DATA_SERVICE_KEY: your_public_data_service_key
+PUBLIC_DATA_BASE_URL: https://apis.data.go.kr/B551011/KorService2
+
+# TMAP Open API 설정 예시입니다. 실제 앱 키는 application-env.yaml에만 적습니다.
+TMAP_APP_KEY: your_tmap_app_key
+TMAP_BASE_URL: https://apis.openapi.sk.com/tmap
+TMAP_PEDESTRIAN_ROUTE_PATH: /routes/pedestrian
+TMAP_CAR_ROUTE_PATH: /routes
+TMAP_TIMEOUT: 5s
+
+# 한국관광공사 TourAPI / 공공데이터포털 인증키입니다.
+PUBLIC_DATA_SERVICE_KEY: your_public_data_service_key
+PUBLIC_DATA_BASE_URL: https://apis.data.go.kr/B551011/KorService2
+PUBLIC_DATA_KEYWORD_SEARCH_PATH: /searchKeyword2
+PUBLIC_DATA_AREA_SEARCH_PATH: /areaBasedList2
+PUBLIC_DATA_TIMEOUT: 5s

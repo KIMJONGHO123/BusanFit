@@ -17,6 +17,8 @@ export const mockDiagnosis: DiagnoseScheduleResult = {
       arrivalTime: '10:30',
       departureTime: '12:00',
       stayMinutes: 90,
+      activities: [],
+      activityMinutes: 0,
       travelMinutesFromPrevious: 30,
     },
     {
@@ -26,6 +28,8 @@ export const mockDiagnosis: DiagnoseScheduleResult = {
       arrivalTime: '12:40',
       departureTime: '14:00',
       stayMinutes: 80,
+      activities: [],
+      activityMinutes: 0,
       travelMinutesFromPrevious: 40,
     },
     {
@@ -35,6 +39,8 @@ export const mockDiagnosis: DiagnoseScheduleResult = {
       arrivalTime: '15:00',
       departureTime: '16:40',
       stayMinutes: 100,
+      activities: [],
+      activityMinutes: 0,
       travelMinutesFromPrevious: 60,
     },
   ],

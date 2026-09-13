@@ -1,3 +1,43 @@
 spring:
+  config:
+    import: optional:classpath:application-env.yaml
+
   application:
-    name: busanfit
+    name: ${APP_NAME}
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: ${DB_DRIVER_CLASS_NAME}
+
+  jpa:
+    open-in-view: ${JPA_OPEN_IN_VIEW}
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO}
+    properties:
+      hibernate:
+        dialect: ${HIBERNATE_DIALECT}
+        format_sql: ${HIBERNATE_FORMAT_SQL}
+
+  sql:
+    init:
+      mode: ${SQL_INIT_MODE}
+
+jwt:
+  secret: ${JWT_SECRET:busanfit-local-development-jwt-secret-change-me}
+  access-token-expiration-millis: ${JWT_ACCESS_TOKEN_EXPIRATION_MILLIS:3600000}
+
+external:
+  public-data:
+    service-key: ${PUBLIC_DATA_SERVICE_KEY:}
+    base-url: ${PUBLIC_DATA_BASE_URL:https://apis.data.go.kr/B551011/KorService2}
+    keyword-search-path: ${PUBLIC_DATA_KEYWORD_SEARCH_PATH:/searchKeyword2}
+    area-search-path: ${PUBLIC_DATA_AREA_SEARCH_PATH:/areaBasedList2}
+    timeout: ${PUBLIC_DATA_TIMEOUT:5s}
+  tmap:
+    app-key: ${TMAP_APP_KEY:}
+    base-url: ${TMAP_BASE_URL:https://apis.openapi.sk.com/tmap}
+    pedestrian-route-path: ${TMAP_PEDESTRIAN_ROUTE_PATH:/routes/pedestrian}
+    car-route-path: ${TMAP_CAR_ROUTE_PATH:/routes}
+    timeout: ${TMAP_TIMEOUT:5s}
