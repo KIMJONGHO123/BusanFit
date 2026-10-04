@@ -30,3 +30,110 @@ constants	고정된 값
 → 프론트로 반환
 → TanStack Query가 응답 결과를 캐시에 보관
 → 결과 화면 표시
+
+
+
+---------------------------------------------------------------------------
+
+                         BusanFit V2
+
+
+                   ┌──────── 서비스 ────────┐
+
+사용자
+  ↓
+Expo
+  ↓
+Diagnosis Context
+  ↓
+Diagnosis Engine
+  ↓
+Rule Registry
+  ↓
+전국 공통 Rule + 지역 특화 Rule
+  ↓
+Rule Result
+  ↓
+일정 판정 + 검증 상태
+  ↓
+사용자
+
+
+                   ┌──────── 개발 ─────────┐
+
+Goal / Context / Rule
+  ↓
+Codex A (Main / Write)
+  ↓
+구현 전 검증
+  ↓
+구현
+  ↓
+자동 검증 + Evaluation
+  ↓
+Codex B (Review / Read Only)
+  ↓
+개발자 판단
+  │
+  └─ 필요 시 Codex A로 반복
+  ↓
+Task Evidence
+  ↓
+개발자 최종 승인
+  ↓
+Merge / Deploy
+
+
+                   ┌──────── 운영 ─────────┐
+
+OpenTelemetry
+  ↓
+로그 / 메트릭 / 트레이스
++
+진단 품질 지표
+  ↓
+AIOps Agent
+  ↓
+근거 기반 원인 분석
+  ↓
+수정 제안
+  ↓
+개발자 판단
+  ↓
+개발 Workflow
+  ↓
+재배포
+  ↓
+다시 관측
+
+
+
+
+루프 구조
+
+개발
+→ 배포
+→ 관측
+→ 문제 발견
+→ AIOps 분석
+→ 개발자 승인
+→ 다시 개발 Workflow
+  ┌─────────────────────┐
+  │    개발 Workflow     │
+  │                     │
+  │ Codex A             │
+  │   ↓                 │
+  │ 구현 / 자동 검증       │
+  │   ↓                 │
+  │ Codex B Review      │
+  │   ↓                 │
+  │ Task Evidence       │
+  │   ↓                 │
+  │ 개발자 최종 승인       │
+  │   ↓                 │
+  │ Commit / Merge      │
+  └──────────┬──────────┘
+→ 재배포
+→ 다시 관측
+
+
