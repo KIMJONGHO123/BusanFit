@@ -107,7 +107,7 @@ DiagnosisRule
 
 발생 시 최종 판단에 반드시 반영해야 하는 Rule.
 
-CRITICAL의 정확한 Rule 분류는 각 규칙을 실제 구현할 때 명시한다. 현재 문서에서는 중요도 체계와 Override 원칙만 고정한다.
+초기 Rule 분류·판정 집계·평가 상태는 [확정 공통 명세](09-diagnosis-contract.md)의 6절을 따른다. 신규 Rule과 날씨 위험 임계값은 해당 정책 작업에서 명시한다.
 
 ## 6. RuleResult가 표현해야 할 정보
 
@@ -131,3 +131,10 @@ CRITICAL의 정확한 Rule 분류는 각 규칙을 실제 구현할 때 명시�
 - 필요한 데이터가 없으면 거짓 판정을 생성하지 않는다.
 - 지역 전용 Rule을 전국 공통 Rule 내부에 섞지 않는다.
 - Rule 결과만으로 데이터 확인 실패를 숨기지 않는다.
+
+## 8. 체류시간과 판정 불가
+
+일정 계산은 활동이 이미 포함된 최종 plannedStaySeconds만 사용한다. 활동시간은 다시 더하지 않는다.
+체류시간 Rule은 권장 총시간과 최종 계획시간을 비교하고, 추정 권장시간 부족은 CAUTION으로 표현한다.
+최종 판정은 POSSIBLE / CAUTION / ADJUSTMENT_REQUIRED / UNDETERMINED이다. decision은 null이 아니다.
+UNVERIFIABLE Rule을 정상 결과로 집계하지 않으며, 확인된 조정 필요는 UNDETERMINED보다 우선한다.

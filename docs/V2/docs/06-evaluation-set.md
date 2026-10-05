@@ -136,3 +136,25 @@ Expected Decision
 Expected Verification Status
 Invariant Check
 ```
+
+## 7. 확정 계약 Evaluation
+
+세부 입력·기대 결과는 [공통 명세](09-diagnosis-contract.md)의 9절을 따른다.
+아래는 구현 시 자동화할 사례이며 현재 통과 결과가 아니다.
+
+| Case ID | 조건 | 기대 |
+|---|---|---|
+| EVAL-301 | 최종 체류 100분, 활동 20분 | 서버 체류 100분, 추가 합산 없음 |
+| EVAL-302 | 기타 활동 사용자 지정 75분 | 75분 유지, 고정 30분 대체 없음 |
+| EVAL-303 | 이동 구간 각각 61초 | 총 122초, 구간별 분 올림 없음 |
+| EVAL-304 | 검색 결과 장소 ID 진단 | 같은 ID 조회·검증 가능 |
+| EVAL-305 | 고정 방문시간 이전/이후 도착 | 대기/조정 필요 구분 |
+| EVAL-306 | 이동시간 확인 불가, 알려진 조정 필요 없음 | UNDETERMINED, decision null 금지 |
+| EVAL-307 | 이동시간 확인 불가, 운영시간 충돌 확인 | ADJUSTMENT_REQUIRED + PARTIAL |
+| EVAL-308 | 시간 계산 가능, 운영정보 확인 불가 | PARTIAL과 확인 불가 이유 노출 |
+| EVAL-309 | 부산·타 지역 혼합 일정 | 부산 장소에만 부산 Rule 적용 |
+| EVAL-310 | 결과와 지도 표시 | 같은 경로 시간·스냅샷 사용 |
+| EVAL-311 | 운영시간 Rule에서 A 장소 충돌·B 장소 확인 불가 | 대상별 결과, ADJUSTMENT_REQUIRED + PARTIAL 유지 |
+| EVAL-312 | 장소 지역 미확인, 다른 모든 항목 평가 성공·문제 없음 | REGION_APPLICABILITY = UNVERIFIABLE, POSSIBLE + PARTIAL, 특정 지역 Rule 미실행, coverage에 원인 표시 |
+| EVAL-313 | 장소 지역 미확인, 모든 평가 항목 확인 불가 | REGION_APPLICABILITY 포함, UNDETERMINED + UNKNOWN, 특정 지역 Rule 미실행 |
+| EVAL-314 | 장소 지역 미확인, 다른 항목에서 조정 필요 확인 | ADJUSTMENT_REQUIRED + PARTIAL 유지, 지역 미확인 결과 노출 |

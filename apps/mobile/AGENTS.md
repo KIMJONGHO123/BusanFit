@@ -8,7 +8,7 @@ https://docs.expo.dev/versions/v57.0.0/
 # 일정 진단
 
 일정 진단 기능을 구현하거나 수정할 때는
-`docs/BusanFit_workflow.md`를 반드시 기준으로 한다.
+루트 `AGENTS.md`와 `docs/V2/docs/09-diagnosis-contract.md`를 반드시 기준으로 한다.
 
 관광지 정보 조회는 공공데이터포털에서 발급받은 관광 관련 API를 사용한다.
 API 인증키는 소스코드에 직접 작성하지 않고 환경변수 또는 설정 파일을 통해 주입한다.

@@ -23,6 +23,9 @@
 
 - 기존 코드에서 V2 진단 핵심 경계를 어디에 만들지 설명할 수 있음
 
+확정 입력·결과·판정 계약은 [09-diagnosis-contract.md](09-diagnosis-contract.md)를 따른다.
+Domain 골격부터 UNDETERMINED와 최종 체류시간 중복 합산 금지를 반영한다.
+
 ## Phase 1. Diagnosis Domain 골격
 
 목표:

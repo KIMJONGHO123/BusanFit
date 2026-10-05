@@ -77,6 +77,15 @@ PARTIAL / UNKNOWN 상태를 숨긴 채 POSSIBLE만 사용자에게 보여주지 
 
 정책 충돌, 구조 변경, Rule 의미 변경처럼 개발자 판단이 필요한 사항을 Agent가 임의로 확정하지 않는다.
 
+## INV-008. Stay Duration No Double Counting
+
+서버 일정 계산은 활동이 포함된 최종 plannedStaySeconds만 반영한다. 활동시간이나 기본 권장시간을 다시 더하지 않는다.
+
+## INV-009. Explicit Undetermined Decision
+
+decision은 null이 아니다. 시간상 실행 가능성의 필수 데이터가 부족하고 확인된 조정 필요가 없으면 UNDETERMINED이다.
+확인된 조정 필요는 유지하며 UNDETERMINED로 덮지 않는다. verificationStatus는 별도로 집계한다.
+
 ## 검증 방법
 
 이 불변조건들은 다음 수단으로 반복 검증한다.

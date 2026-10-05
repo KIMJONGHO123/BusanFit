@@ -26,7 +26,8 @@ Diagnosis Result
 
 ## 핵심 개념
 
-- 일정 판정: `POSSIBLE`, `CAUTION`, `ADJUSTMENT_REQUIRED`
+- 일정 판정: `POSSIBLE`, `CAUTION`, `ADJUSTMENT_REQUIRED`, `UNDETERMINED`
+- 서버는 활동이 포함된 최종 체류시간만 사용하며 활동시간을 다시 더하지 않음
 - 검증 상태: `VERIFIED`, `PARTIAL`, `UNKNOWN`
 - 전국 공통 Rule과 지역 특화 Rule 분리
 - 외부 API는 Port/Adapter 구조로 분리
@@ -37,7 +38,7 @@ Diagnosis Result
 
 ## 문서
 
-- `AGENTS.md` - AI Agent 및 개발 작업의 최상위 규칙
+- [루트 AGENTS.md](../../AGENTS.md) - AI Agent 및 개발 작업의 최상위 규칙
 - `docs/00-project-overview.md` - 프로젝트 목표와 서비스 범위
 - `docs/01-architecture.md` - 전체 아키텍처
 - `docs/02-diagnosis-rules.md` - Rule 모델과 진단 기준
@@ -47,6 +48,7 @@ Diagnosis Result
 - `docs/06-evaluation-set.md` - 재현 가능한 Evaluation 기준
 - `docs/07-observability-aiops.md` - 운영 관측과 AIOps
 - `docs/08-implementation-roadmap.md` - 실제 구현 시작 순서
+- `docs/09-diagnosis-contract.md` - 확정 모바일·서버 입력·결과 계약
 - `docs/evidence/TEMPLATE.md` - Task Evidence 템플릿
 
 ## 첫 구현 권장 순서
