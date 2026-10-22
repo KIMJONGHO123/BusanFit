@@ -4,6 +4,9 @@
 
 세부 클래스명과 패키지명은 현재 저장소 구조를 확인한 뒤 확정한다.
 
+현재 프런트엔드 구현 대상은 `apps/web`의 React 웹(Vite + TypeScript)이다.
+기존 `apps/mobile`의 Expo 앱은 유지하고, 웹 우선 개발 후 앱 개발을 재개한다.
+
 ## Phase 0. 현재 코드 기준선 확보
 
 목표:
@@ -135,7 +138,7 @@ Repository Port
 → National Rule only
 ```
 
-## Phase 7. 진단 결과 API와 Expo 연결
+## Phase 7. 진단 결과 API와 React 웹 연결
 
 결과 응답에 최소 포함:
 
@@ -148,7 +151,7 @@ Repository Port
 
 완료 조건:
 
-- Expo 앱에서 POSSIBLE만 단독 표시하지 않음
+- React 웹에서 POSSIBLE만 단독 표시하지 않음
 - PARTIAL / UNKNOWN이 사용자에게 노출됨
 
 ## Phase 8. Evaluation 자동화

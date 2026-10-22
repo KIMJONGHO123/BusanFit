@@ -5,7 +5,7 @@
 ```text
 사용자
  ↓
-Expo 앱
+React 웹 (Vite + TypeScript)
  ↓
 일정 구성
  ↓
@@ -35,7 +35,7 @@ Diagnosis Result
  ↓
 최종 진단 결과
  ↓
-Expo 앱
+React 웹 (Vite + TypeScript)
 ```
 
 ## 2. 입력 검증
@@ -148,6 +148,6 @@ Region Coverage Metadata
 
 ## 8. 확정 입력·결과 계약
 
-모바일·서버의 입력, 시간 계산, 판정 집계와 전환은 [공통 명세](09-diagnosis-contract.md)를 따른다.
+웹·서버의 입력, 시간 계산, 판정 집계와 전환은 [공통 명세](09-diagnosis-contract.md)를 따른다.
 서버는 최종 plannedStaySeconds에 활동시간을 다시 더하지 않는다.
 판정 불가는 null 대신 UNDETERMINED로 표현하며 검증 상태와 분리한다.

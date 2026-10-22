@@ -17,7 +17,7 @@ BusanFit V2는 사용자가 구성한 국내 여행 일정이 실제로 실행 �
 ```text
 사용자
  ↓
-Expo 앱
+React 웹 (Vite + TypeScript)
  ↓
 일정 구성
  ↓

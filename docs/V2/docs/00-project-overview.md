@@ -11,7 +11,7 @@ BusanFit V2는 사용자가 입력한 여행 일정을 단순 저장하거나 �
 ```text
 사용자
  ↓
-Expo 앱
+React 웹 (Vite + TypeScript)
  ↓
 일정 추가
  ↓
