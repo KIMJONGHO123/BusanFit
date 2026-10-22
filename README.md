@@ -7,4 +7,4 @@
 - [일정 진단 정책](docs/BusanFit_workflow.md)
 - [현재 구현 상태·개발 방향·AI Agent Workflow](docs/development-direction.md)
 
-서버는 `apps/server`, Expo 모바일 앱은 `apps/mobile`에 있습니다. AIOps, MCP, OpenTelemetry와 자동 Agent Workflow는 향후 계획이며 현재 구현된 기능으로 간주하지 않습니다.
+웹 우선 개발 대상은 [`apps/web`](apps/web/README.md)의 React + Vite + TypeScript 프로젝트입니다. 서버는 `apps/server`, 보류 중인 기존 Expo 모바일 앱은 `apps/mobile`에 유지합니다. AIOps, MCP, OpenTelemetry와 자동 Agent Workflow는 향후 계획이며 현재 구현된 기능으로 간주하지 않습니다.
