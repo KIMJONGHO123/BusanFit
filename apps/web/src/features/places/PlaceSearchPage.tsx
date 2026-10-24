@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Icon } from '../../components/Icon'
 import { PlaceImage } from './PlaceImage'
-import { addPlace, searchPlaces } from './places'
+import { searchPlaces } from './places'
 import type { Place } from './places'
 
 type SearchState = {
@@ -12,7 +12,12 @@ type SearchState = {
   page: number
 }
 
-export function PlaceSearchPage() {
+export function PlaceSearchPage({ selected, onAdd, onRemove, onNext }: {
+  selected: Place[]
+  onAdd: (place: Place) => void
+  onRemove: (id: string) => void
+  onNext: () => void
+}) {
   const [input, setInput] = useState('')
   const [search, setSearch] = useState<SearchState>({
     status: 'idle',
@@ -20,7 +25,6 @@ export function PlaceSearchPage() {
     keyword: '',
     page: 1,
   })
-  const [selected, setSelected] = useState<Place[]>([])
   const [detail, setDetail] = useState<Place | null>(null)
   const [announcement, setAnnouncement] = useState('')
   const request = useRef<AbortController | null>(null)
@@ -60,11 +64,11 @@ export function PlaceSearchPage() {
     void runSearch(input)
   }
   function add(place: Place) {
-    setSelected((current) => addPlace(current, place))
+    onAdd(place)
     setAnnouncement(`${place.name}, 선택한 장소에 추가했습니다.`)
   }
   function remove(place: Place) {
-    setSelected((current) => current.filter((item) => item.id !== place.id))
+    onRemove(place.id)
     setAnnouncement(`${place.name}, 선택을 해제했습니다.`)
   }
   function openDetail(place: Place) {
@@ -111,7 +115,7 @@ export function PlaceSearchPage() {
         <div className="page-heading">
           <div>
             <p className="eyebrow">여행의 시작, 장소 고르기</p>
-            <h1>어디에 가고 싶으세요?</h1>
+            <h1 tabIndex={-1}>어디에 가고 싶으세요?</h1>
             <p>
               가고 싶은 장소를 모아보세요.
               <br className="mobile-break" /> 시간과 동선은 다음 단계에서
@@ -363,21 +367,22 @@ export function PlaceSearchPage() {
               <p>
                 <Icon name="info" />
                 <span>
-                  선택은 현재 화면에서만 유지돼요.
+                  선택과 입력은 화면을 오가도 유지돼요.
                   <br />
                   새로고침하면 초기화됩니다.
                 </span>
               </p>
               <button
                 className="button primary next-button"
-                disabled
+                disabled={!selected.length}
+                onClick={onNext}
                 aria-describedby="next-note"
               >
                 순서·시간 설정
                 <Icon name="arrow" />
               </button>
               <span id="next-note">
-                시간 설정은 다음 화면에서 제공될 예정이에요.
+                장소별 방문시간과 활동을 설정할 수 있어요.
               </span>
             </div>
           </aside>

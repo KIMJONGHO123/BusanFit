@@ -998,3 +998,124 @@ h1 {
     transition: none !important;
   }
 }
+
+/* TASK-007: the approved monochrome workspace, with an ordered itinerary. */
+.brand-button { background: none; padding: 0; }
+.planner-grid { align-items: start; }
+.itinerary-area, .planner-sidebar { min-width: 0; }
+.itinerary-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.itinerary-heading h2, .planner-panel h2 { font-size: 18px; font-weight: 600; }
+.itinerary-heading h2 span { color: var(--muted); margin-left: 6px; font-size: 14px; }
+.itinerary-heading p { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.7; }
+.itinerary-heading .button { flex-shrink: 0; font-size: 12px; background: white; }
+.itinerary-list { list-style: none; padding: 0 0 0 42px; margin: 0; }
+.itinerary-stop { position: relative; padding-bottom: 24px; border-left: 1px solid #d5d8da; margin-left: -28px; padding-left: 28px; }
+.itinerary-stop:last-child { border-left-color: transparent; }
+.timeline-number { position: absolute; left: -17px; top: 22px; width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: white; display: grid; place-items: center; font-size: 11px; font-variant-numeric: tabular-nums; outline: 6px solid #f4f4f4; }
+.stop-card, .planner-panel { background: white; border-radius: var(--radius); box-shadow: 0 4px 8px #2424240d; }
+.stop-header { display: flex; align-items: center; gap: 16px; padding: 24px 24px 16px; }
+.stop-header .place-image { width: 68px; height: 68px; flex-shrink: 0; }
+.stop-title { min-width: 0; }
+.stop-title h3 { font-size: 19px; font-weight: 600; letter-spacing: -.5px; overflow-wrap: anywhere; margin: 4px 0; }
+.stop-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 24px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.stop-toolbar > span { font-size: 11px; color: var(--muted); }
+.stop-toolbar > div { display: flex; }
+.stop-toolbar .icon-button { font-size: 19px; }
+.stop-toolbar .icon-button:disabled { color: #898989; background: #f7f7f7; }
+.stop-body { padding: 20px 24px 24px; }
+.field { display: block; font-size: 13px; font-weight: 500; line-height: 1.6; }
+.field input { display: block; width: 100%; min-width: 0; max-width: 100%; margin-top: 8px; padding: 10px 12px; min-height: 46px; border: 1px solid #d5d8da; border-radius: 8px; background: white; color: var(--ink); font-size: 16px; font-weight: 400; }
+.field input::placeholder { color: #727272; font-size: 13px; }
+.stop-body > .field { max-width: 220px; }
+.optional { font-weight: 400; font-size: 11px; color: var(--muted); margin-left: 5px; }
+.field-help { color: #626970; font-size: 12px; line-height: 1.8; margin-top: 8px; overflow-wrap: anywhere; }
+.activity-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.activity-fieldset legend { font-size: 13px; font-weight: 500; margin-bottom: 12px; }
+.activity-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.activity-option { display: flex; align-items: center; gap: 7px; min-height: 46px; padding: 10px 12px; background: #f4f4f4; border-radius: 8px; font-size: 12px; cursor: pointer; border: 1px solid transparent; }
+.activity-option small { margin-left: auto; font-size: 11px; color: #626970; white-space: nowrap; }
+.activity-option input, .visit-time-toggle input { accent-color: #101010; flex-shrink: 0; margin: 0; width: 16px; height: 16px; }
+.activity-option.is-selected { border-color: var(--ink); background: #fff; }
+.custom-duration { margin-top: 16px; max-width: 230px; }
+.activity-total { display: flex; justify-content: space-between; gap: 12px; padding: 16px 0; font-size: 12px; }
+.activity-total strong { font-weight: 600; }
+.stay-editor { background: #f4f4f4; border-radius: 8px; padding: 18px; }
+.stay-editor .field input { max-width: 240px; }
+.visit-time-option { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--line); }
+.visit-time-toggle { display: flex; align-items: center; gap: 10px; font-size: 13px; min-height: 44px; cursor: pointer; }
+.visit-time-option .field { margin-top: 14px; max-width: 220px; }
+.visit-time-option > .field-help { margin-top: 0; }
+.activity-reminder { padding-top: 10px; border-top: 1px solid #d5d8da; }
+.unverified-note { display: flex; align-items: flex-start; gap: 7px; margin-top: 16px; font-size: 11px; }
+.unverified-note svg { width: 15px; height: 18px; margin-top: 2px; }
+.segment-placeholder { padding: 18px 8px 0; font-size: 11px; color: #626970; }
+.planner-sidebar { display: grid; gap: 20px; }
+.planner-panel { padding: 24px; }
+.planner-panel .eyebrow { font-size: 11px; margin-bottom: 6px; }
+.planner-panel > .field { margin-top: 24px; }
+.time-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin-top: 18px; }
+.time-fields input { padding-inline: 7px; font-size: 14px; }
+.departure-search { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.departure-current span { display: block; font-size: 12px; color: var(--muted); }
+.departure-current strong { display: block; font-size: 16px; margin-top: 8px; font-weight: 600; overflow-wrap: anywhere; }
+.departure-search > .button { margin: 10px 0 20px; font-size: 12px; background: #f4f4f4; }
+.departure-query { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
+.departure-query input { margin: 0; flex: 1; width: 0; }
+.departure-query > input { min-height: 46px; min-width: 0; border: 1px solid #d5d8da; border-radius: 8px; padding: 10px 12px; font-size: 16px; }
+.departure-query > input::placeholder { color: #727272; font-size: 13px; }
+.departure-query .button { flex-shrink: 0; font-size: 12px; background: #f4f4f4; padding: 10px 14px; }
+.departure-results { list-style: none; padding: 0; margin: 12px 0 0; max-height: 270px; overflow-y: auto; }
+.departure-results button { text-align: left; padding: 12px 8px; width: 100%; min-height: 44px; background: white; border-bottom: 1px solid var(--line); }
+.departure-results button:hover { background: #f4f4f4; }
+.departure-results strong { display: block; font-size: 12px; font-weight: 500; overflow-wrap: anywhere; }
+.departure-results span { display: block; font-size: 11px; margin-top: 5px; line-height: 1.7; color: var(--muted); overflow-wrap: anywhere; }
+.summary-panel dl { margin: 22px 0 16px; }
+.summary-panel dl div { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; font-size: 12px; }
+.summary-panel dt { color: #626970; }
+.summary-panel dd { margin: 0; font-weight: 500; }
+.summary-panel .next-button { margin-top: 22px; }
+.summary-panel > .field-help:last-child { font-size: 11px; }
+.policy-error { background: #f4f4f4; border-radius: 8px; padding: 14px; font-size: 12px; line-height: 1.8; }
+.policy-error .button { font-size: 12px; background: white; margin-top: 10px; }
+.field-error { font-size: 12px; line-height: 1.8; margin-top: 12px; }
+.input-check { margin-top: 24px; line-height: 1.8; }
+.input-check li, .input-check p { font-size: 13px; margin-top: 8px; }
+.planner-bottom { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-top: 28px; }
+.planner-bottom .button { background: white; font-size: 12px; }
+.planner-bottom p { font-size: 11px; color: var(--muted); line-height: 1.8; }
+@media (max-width: 960px) {
+  .stop-header { padding: 20px 18px 12px; }
+  .stop-body { padding: 18px; }
+  .stop-toolbar { margin-inline: 18px; }
+  .planner-panel { padding: 20px; }
+  .activity-option { padding-inline: 8px; }
+}
+@media (max-width: 760px) {
+  .planner-workspace { padding-bottom: 20px; }
+  .planner-grid { display: flex; flex-direction: column; gap: 28px; }
+  .planner-sidebar { display: contents; }
+  .planner-sidebar > .planner-panel:first-child { order: -1; }
+  .planner-grid > *, .planner-sidebar > * { width: 100%; }
+  .itinerary-heading { gap: 10px; }
+  .itinerary-heading h2 { font-size: 17px; }
+  .itinerary-heading p { font-size: 11px; }
+  .itinerary-heading .button { padding-inline: 12px; }
+  .itinerary-list { padding-left: 27px; }
+  .itinerary-stop { margin-left: -13px; padding-left: 20px; padding-bottom: 20px; }
+  .timeline-number { width: 28px; height: 28px; left: -14px; font-size: 10px; }
+  .stop-header { padding: 18px 14px 12px; gap: 10px; }
+  .stop-header .place-image { width: 48px; height: 56px; }
+  .stop-title h3 { font-size: 16px; }
+  .stop-toolbar { margin-inline: 14px; }
+  .stop-body { padding: 16px 14px 18px; }
+  .activity-options { grid-template-columns: 1fr; }
+  .activity-option { padding: 10px 12px; }
+  .stay-editor { padding: 14px; }
+  .planner-bottom { flex-direction: column; align-items: flex-start; }
+}
+@media (min-width: 380px) and (max-width: 760px) {
+  .activity-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .activity-option { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 2px 7px; padding: 9px; }
+  .activity-option input { grid-row: span 2; }
+  .activity-option small { grid-column: 2; margin-left: 0; }
+}
