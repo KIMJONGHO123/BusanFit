@@ -69,7 +69,25 @@ Vite 공식 React·TypeScript 템플릿을 기반으로 구성했습니다. Vite
 - 날짜·같은 날 시작/종료 순서·지정 방문시간의 입력/범위·양의 정수 시간·활동 중복을 검사합니다. 이동시간·예상 도착·잔여시간·일정 충돌 판단은 서버 진단 연결 후 제공합니다.
 - PC는 세로 일정과 오른쪽 여행 조건/요약, 모바일은 여행 조건→일정→요약 순서입니다. 순서 변경은 키보드로도 가능한 위/아래 버튼을 사용합니다.
 
-테스트는 설치된 Google Chrome을 사용합니다. 테스트 내부에서만 합성 API 응답을 주입하며 실제 TourAPI 통합 성공을 검증하지 않습니다. `npm test`는 기존 5173 개발 서버를 재사용하거나 직접 시작합니다. 캡처는 `test-results/`에 생성되며 `*-fixture.png`는 테스트 데이터 화면입니다. 모바일은 Chromium 에뮬레이션으로, 실제 iOS Safari 검증과 다릅니다.
+테스트는 설치된 Google Chrome을 사용합니다. 기본 회귀 테스트는 테스트 내부에서 합성 API 응답을 주입하며 실제 TourAPI 통합 성공과 구분합니다. `npm test`는 기존 5173 개발 서버를 재사용하거나 직접 시작하고, 실제 API 테스트는 기본적으로 건너뜁니다. 캡처는 `test-results/`에 생성되며 `*-fixture.png`는 테스트 데이터 화면입니다. 모바일은 Chromium 에뮬레이션으로, 실제 iOS Safari 검증과 다릅니다.
+
+### 실제 TourAPI 검증
+
+먼저 [서버 실행 문서](../server/README.md)에 따라 MySQL과 Spring Boot 서버를 실행합니다. 서버의 실제 TourAPI 인증키가 필요하며, 웹에는 키를 넣지 않습니다.
+
+```powershell
+cd C:\BusanFit\apps\web
+$env:BUSANFIT_LIVE_TOURAPI = '1'
+try {
+  npx playwright test tests/tourapi-live.spec.ts --workers=1
+} finally {
+  Remove-Item Env:BUSANFIT_LIVE_TOURAPI -ErrorAction SilentlyContinue
+}
+```
+
+`tests/tourapi-live.spec.ts`는 응답 가로채기나 테스트 데이터 대체 없이 실제 웹→서버→TourAPI를 검증합니다. 해운대 검색·상세·선택·일정 편집·실제 활동 정책·화면 왕복 입력 유지와 부산 목록·빈 검색을 확인합니다. 감천문화마을 검색과 7페이지 결과로 법정동 지역 필터의 회귀도 검증합니다. API 호출량을 줄이기 위해 한 worker로 실행합니다. 실패하면 실제 환경의 실패로 보고하며 mock으로 대체하지 않습니다.
+
+2026-10-26 TASK-010에서 부산 지역 조건을 `lDongRegnCd=26`으로 교체한 뒤, 실제 API 6건을 포함한 전체 브라우저 테스트 54건이 통과했습니다. 초기 검증이 놓친 감천문화마을 누락과 후속 수정 내용은 TASK-010 Evidence에 기록합니다. `*-tourapi-live-*.png`는 실제 응답 화면입니다. 이 성공은 장소 검색과 일정 입력 흐름의 검증이며, 운영시간·권장 체류시간의 검증이나 V2 진단 성공을 의미하지 않습니다.
 
 `.env` 및 환경별 `.env.*`는 Git에서 제외합니다(`.env.example`만 추적 가능). Vite의 `VITE_` 변수는 브라우저에 공개되므로 외부 API 비밀키를 넣지 않습니다. 실제 연동에 필요한 환경 변수와 배포 설정은 해당 작업에서 정의합니다.
 
@@ -78,4 +96,5 @@ Vite 공식 React·TypeScript 템플릿을 기반으로 구성했습니다. Vite
 - [불변조건](../../docs/V2/docs/03-invariants.md)
 - [작업 근거 TASK-005](../../docs/V2/docs/evidence/TASK-005.md)
 - [일정·활동 편집 TASK-007](../../docs/V2/docs/evidence/TASK-007.md)
+- [실제 TourAPI 연동 검증 TASK-010](../../docs/V2/docs/evidence/TASK-010.md)
 - [Vite 공식 시작 안내](https://vite.dev/guide/)
