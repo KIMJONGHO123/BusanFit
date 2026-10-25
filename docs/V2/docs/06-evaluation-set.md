@@ -158,3 +158,29 @@ Invariant Check
 | EVAL-312 | 장소 지역 미확인, 다른 모든 항목 평가 성공·문제 없음 | REGION_APPLICABILITY = UNVERIFIABLE, POSSIBLE + PARTIAL, 특정 지역 Rule 미실행, coverage에 원인 표시 |
 | EVAL-313 | 장소 지역 미확인, 모든 평가 항목 확인 불가 | REGION_APPLICABILITY 포함, UNDETERMINED + UNKNOWN, 특정 지역 Rule 미실행 |
 | EVAL-314 | 장소 지역 미확인, 다른 항목에서 조정 필요 확인 | ADJUSTMENT_REQUIRED + PARTIAL 유지, 지역 미확인 결과 노출 |
+
+## 8. 근거 기반 판정 보완 Evaluation
+
+EVAL-315~322는 TASK-008 사전 검토와 개발자 결정을 반영한 명세 사례다. 엔진 구현 시 자동화할 대상이며, 현재 실행하거나 통과한 결과가 아니다.
+Rule·target은 기존 공통 계약을 사용하며, 같은 장소의 독립 운영조건은 조건별 근거가 구분되는 평가 항목으로 남긴다.
+
+### 공통 조건
+
+- 유효한 요청을 서버에서 진단하는 경우를 전제로 한다. 대상별 RuleResult, 최종 decision·verificationStatus, 계산 불가 표시와 coverage를 확인한다.
+- 별도 기재가 없으면 여행시간 09:00~12:00, 최종 체류 합계 60분, 이동 합계 10분, 고정 방문시간·대기 없음이다. 시간 계산은 가능하고 여유시간·이동 비율 주의 조건에도 해당하지 않는다.
+- 각 사례에 명시한 확인 불가·위반 항목과 그 미확인 데이터에 의존하는 평가 외의 적용 대상 평가는 모두 EVALUATED + PASS로 주어진다. 이는 재현 가능한 검증 조건이며 실제 미지원 항목을 PASS로 취급하라는 뜻이 아니다.
+- 검증 불가 이유는 해당 RuleResult와 coverage에 표시한다. 확인 불가를 PASS 또는 NOT_APPLICABLE로 대체하지 않고, 확인 가능한 다른 평가는 계속한다.
+
+| Case ID | 조건(Given) | 기대 Rule 결과·계산 상태 | 기대 Decision / Verification |
+|---|---|---|---|
+| EVAL-315 | 사용 가능 3시간, 최종 체류 합계 4시간, 필수 이동시간 미확인 | 일정 종료시간 초과 IMPORTANT + EVALUATED + ADJUSTMENT_REQUIRED, 이동 UNVERIFIABLE. 정확한 requiredSeconds·remainingSeconds와 미확인 구간 이후 예상시각은 계산 불가 | ADJUSTMENT_REQUIRED + PARTIAL |
+| EVAL-316 | 사용 가능 3시간, 최종 체류 합계 1시간, 필수 이동시간 미확인 | 체류 합계만으로 일정 가능 PASS를 만들지 않음. 이동 및 그 데이터에 의존하는 평가 UNVERIFIABLE, 정확한 총시간·잔여시간 계산 불가 | UNDETERMINED + PARTIAL |
+| EVAL-317 | 기본 권장시간의 출처는 있지만 선택 활동이 이미 포함됐는지 불명확 | 권장 총시간 비교 UNVERIFIABLE, 임의 합산·차감 및 부족 경고 없음. 최종 plannedStaySeconds를 이용한 시간 계산은 유지 | POSSIBLE + PARTIAL |
+| EVAL-318 | 방문 가능 여부에 필요한 휴게시간 정보를 해석하지 못하며 독립적으로 확인된 위반 없음 | 해당 운영조건 UNVERIFIABLE, 일부 운영정보만으로 전체 운영시간 PASS 또는 조정 필요를 생성하지 않음 | POSSIBLE + PARTIAL |
+| EVAL-319 | 같은 장소에서 방문일 휴무가 확정됐고 별도 휴게시간 정보는 해석하지 못함 | 휴무 EVALUATED + ADJUSTMENT_REQUIRED와 휴게시간 UNVERIFIABLE을 같은 target의 조건별 근거로 구분해 유지 | ADJUSTMENT_REQUIRED + PARTIAL |
+| EVAL-320 | 공식 통제 응답은 받았지만 여행 날짜·대상에 적용되는지 불명확 | 해당 통제 평가 UNVERIFIABLE, CRITICAL 조정 필요를 임의 생성하지 않음. 확인하지 못한 적용 범위 표시 | POSSIBLE + PARTIAL |
+| EVAL-321 | 미래 여행일에 대해 기존 계약이 허용한 조회 시점 TMAP 예상시간을 사용하며 출처·조회시각·의미가 확인됨 | 미래 예측이 아니라는 이유만으로 이동 평가를 UNVERIFIABLE로 만들지 않음. 공통 조건의 이동 10분으로 계산하고 조회 시점 추정임을 표시 | POSSIBLE + VERIFIED |
+| EVAL-322 | 필수 이동 구간 조회에서 통신 실패 또는 의미가 불명확한 빈 경로 응답을 받음(각각 검증) | 이동 UNVERIFIABLE, 0초·이동 가능·이동 불가로 대체하지 않음. 정확한 총시간·잔여시간 계산 불가 | UNDETERMINED + PARTIAL |
+
+불변조건 확인: INV-001/004/005/008/009를 공통 확인하고, EVAL-320에서 적용 근거 없는 CRITICAL 확정을 방지한다. 지역 선택과 Scope는 기존 정책을 유지한다.
+명확한 이동 불가 응답의 인정 조건·판정, 복잡한 운영시간 파서, 데이터별 유효기간·갱신주기 정의는 이 사례들의 구현 요구에 포함하지 않는다.
