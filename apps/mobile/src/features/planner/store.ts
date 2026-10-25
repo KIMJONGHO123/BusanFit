@@ -1,4 +1,5 @@
 // 일정 작성 중 화면 간에 유지해야 하는 입력 상태를 관리하는 Zustand store입니다.
+// 날짜, 시간, 출발 좌표, 선택 장소, 활동이 이 파일 zustand 상태에 보관된다.
 import { create } from 'zustand';
 
 import type { Place, PlaceActivity, SelectedPlace, TripCondition } from './types';

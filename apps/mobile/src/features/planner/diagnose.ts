@@ -1,3 +1,5 @@
+// chlwhd tlrksdmf rPtks
+
 import { getActivityMinutes } from './activities';
 import type { ScheduleRouteSegment } from './route-segments';
 import type { DiagnoseScheduleResult, SelectedPlace, TripCondition } from './types';

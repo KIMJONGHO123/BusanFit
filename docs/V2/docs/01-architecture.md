@@ -99,9 +99,9 @@ Rule Registry의 책임:
 잘못된 예:
 
 ```java
-if (region.equals("BUSAN")) {
-    // 부산 전용 로직 수십 줄
-}
+//if (region.equals("BUSAN")) {
+//    // 부산 전용 로직 수십 줄
+//}
 ```
 
 지향 구조:

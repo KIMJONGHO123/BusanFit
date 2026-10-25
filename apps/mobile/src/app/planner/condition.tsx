@@ -1,3 +1,5 @@
+// 사용자가 첫 페이지에서 입력하면 이동하는 곳
+
 import { Href, router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
