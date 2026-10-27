@@ -1,6 +1,7 @@
+import { RouteMap } from './RouteMap'
 import { Icon } from '../../components/Icon'
 import { formatDuration, formatTime, ruleLabels } from './diagnosis'
-import type { Diagnosis, DiagnosisSnapshot, RuleResult, Segment, Target } from './diagnosis'
+import type { Diagnosis, DiagnosisSnapshot, RuleResult, Target } from './diagnosis'
 
 const decisions: Record<Diagnosis['decision'], { title: string; description: string }> = {
   POSSIBLE: { title: '시간상 실행 가능한 일정이에요', description: '확인한 이동·체류시간 기준으로 여행시간 안에 방문할 수 있어요.' },
@@ -12,37 +13,6 @@ const verifications: Record<Diagnosis['verificationStatus'], { label: string; de
   VERIFIED: { label: '전체 확인', description: '적용 대상 진단 항목을 모두 확인했어요.' },
   PARTIAL: { label: '일부 확인', description: '확인하지 못한 운영시간·날씨·지역 정보 등이 있어요. 아래 확인 한계를 함께 살펴보세요.' },
   UNKNOWN: { label: '확인 불가', description: '적용 대상 항목을 확인하지 못했어요. 여행이 가능하거나 안전하다는 뜻이 아닙니다.' },
-}
-
-function RoutePreview({ segments }: { segments: Segment[] }) {
-  const known = segments.filter((s) => s.route.value !== null)
-  if (!known.length) return <div className="route-empty"><Icon name="pin" /><h3>확인된 이동 경로가 없어요</h3><p>이동정보를 확인한 뒤 다시 진단해 주세요. 임의 경로는 표시하지 않아요.</p></div>
-  const coordinates = known.flatMap((s) => s.route.value!.coordinates)
-  const { minLat, maxLat, minLon, maxLon } = coordinates.reduce((bounds, c) => ({
-    minLat: Math.min(bounds.minLat, c.latitude), maxLat: Math.max(bounds.maxLat, c.latitude),
-    minLon: Math.min(bounds.minLon, c.longitude), maxLon: Math.max(bounds.maxLon, c.longitude),
-  }), { minLat: Infinity, maxLat: -Infinity, minLon: Infinity, maxLon: -Infinity })
-  const correction = Math.cos((minLat + maxLat) / 2 * Math.PI / 180)
-  const width = (maxLon - minLon) * correction, height = maxLat - minLat
-  const scale = Math.min(490 / (width || .00001), 260 / (height || .00001))
-  const point = (latitude: number, longitude: number) => [300 + ((longitude - (minLon + maxLon) / 2) * correction) * scale, 170 - (latitude - (minLat + maxLat) / 2) * scale]
-  return <svg className="route-preview" viewBox="0 0 600 340" role="img" aria-label="진단 결과와 같은 조회의 확인된 구간 경로. 지리적 배경 없이 경로 모양과 방문 순서를 표시합니다.">
-    <rect width="600" height="340" rx="12" fill="#f4f4f4" />
-    {known.map((segment) => <polyline key={segment.segmentId} data-testid="route-line" data-segment-id={segment.segmentId} points={segment.route.value!.coordinates.map((c) => point(c.latitude, c.longitude).join(',')).join(' ')} fill="none" stroke="#41484e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />)}
-    {segments.map((segment, i) => {
-      const route = segment.route.value
-      if (!route) return null
-      const destination = route.coordinates.at(-1)!
-      const [x, y] = point(destination.latitude, destination.longitude)
-      const origin = route.coordinates[0]
-      const [startX, startY] = point(origin.latitude, origin.longitude)
-      return <g key={segment.segmentId}>
-        {i === 0 && <g><circle cx={startX} cy={startY} r="7" fill="white" stroke="#101010" strokeWidth="2" /><text x={startX + 12} y={startY - 12}>출발</text></g>}
-        <circle cx={x} cy={y} r="15" fill="#101010" stroke="white" strokeWidth="3" />
-        <text x={x} y={y + 4} textAnchor="middle" fill="white">{i + 1}</text>
-      </g>
-    })}
-  </svg>
 }
 
 export function DiagnosisPage({ result, snapshot, onEdit, onSearch, onLogout, nickname }: {
@@ -92,7 +62,7 @@ export function DiagnosisPage({ result, snapshot, onEdit, onSearch, onLogout, ni
             </li>
           })}</ol>
         </section>
-        <div className="result-side"><section className="planner-panel" aria-labelledby="route-heading"><div className="section-title"><h2 id="route-heading">경로 미리보기</h2><span>확인된 구간만 표시</span></div><RoutePreview segments={schedule.segments} /><p className="field-help">지리적 배경 없이 경로 모양을 표시해요. 이동시간과 경로는 같은 진단 조회 결과입니다.</p><p className="field-help">TMAP 조회 시점의 예상시간이며, 미래 출발시각 예측은 아니에요.</p></section>
+        <div className="result-side"><section className="planner-panel" aria-labelledby="route-heading"><div className="section-title"><h2 id="route-heading">일정 경로 지도</h2><span>확인된 구간만 표시</span></div><RouteMap key={result.diagnosisId} segments={schedule.segments} snapshot={snapshot} /><p className="field-help">확인된 이동 구간만 연결해요. 이동시간과 경로는 같은 진단 조회 결과입니다.</p><p className="field-help">TMAP 조회 시점의 예상시간이며, 미래 출발시각 예측은 아니에요.</p></section>
           <section className="planner-panel diagnosis-context"><h2>이번 진단의 기준</h2><dl><div><dt>최종 체류 합계</dt><dd>{formatDuration(schedule.totalStaySeconds)}</dd></div><div><dt>대기 합계</dt><dd>{formatDuration(schedule.totalWaitingSeconds)}</dd></div><div><dt>진단 시각</dt><dd>{formatTime(result.diagnosedAt)}</dd></div></dl><p className="field-help">활동시간은 머무를 시간에 포함되어 있어요. 다시 더하지 않습니다.</p></section>
         </div>
       </div>

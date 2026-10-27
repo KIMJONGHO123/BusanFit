@@ -1153,8 +1153,12 @@ h1 {
 .section-title h2 { font-size: 18px; font-weight: 600; }
 .section-title > span { color: #626970; font-size: 11px; flex-shrink: 0; }
 .result-side { display: grid; gap: 24px; min-width: 0; }
-.route-preview { display: block; width: 100%; height: auto; margin-top: 24px; }
-.route-preview text { font-family: inherit; font-size: 12px; }
+.route-map-shell { position: relative; height: 440px; margin-top: 24px; overflow: hidden; border-radius: 12px; border: 1px solid var(--line); background: #f4f4f4; }
+.route-map-frame { display: block; width: 100%; height: 100%; border: 0; }
+.route-map-message { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; text-align: center; background: #f4f4f4; }
+.route-map-message h3 { font-size: 16px; }
+.route-map-message p { font-size: 12px; line-height: 1.9; color: #626970; max-width: 290px; }
+.route-map-message .button { background: white; }
 .route-empty { min-height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 24px; margin-top: 20px; background: #f4f4f4; border-radius: 8px; }
 .route-empty h3 { font-size: 16px; }
 .route-empty p { font-size: 12px; line-height: 1.9; color: #626970; }
@@ -1207,6 +1211,7 @@ h1 {
   .diagnosis-metrics strong { font-size: 20px; }
   .diagnosis-grid { grid-template-columns: 1fr; }
   .result-stops { padding-left: 18px; }
+  .route-map-shell { height: 390px; }
   .stop-timing > div { font-size: 11px; }
   .auth-dialog .dialog-content { padding-inline: 22px; }
 }

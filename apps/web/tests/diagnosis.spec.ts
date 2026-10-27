@@ -1,38 +1,10 @@
+import { openPlanner, login, diagnose } from './diagnosis-helpers'
 import { test, expect } from '@playwright/test'
-import type { Page } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import { formatDuration, parseDiagnosis } from '../src/features/diagnosis/diagnosis'
-import { cautionDiagnosis, diagnosisFixture, fixturePlace, fixturePolicy, unknownDiagnosis } from './diagnosis-fixtures'
+import { cautionDiagnosis, diagnosisFixture, fixturePlace, unknownDiagnosis } from './diagnosis-fixtures'
 
 const endpoint = '**/api/v2/planner/diagnose'
-async function openPlanner(page: Page) {
-  await page.route('**/api/places/search?*', (route) => route.fulfill({ json: [fixturePlace] }))
-  await page.route('**/api/planner/activity-policy', (route) => route.fulfill({ json: fixturePolicy }))
-  await page.goto('/')
-  await page.getByRole('button', { name: '부산 관광지 둘러보기' }).click()
-  await page.getByRole('button', { name: `${fixturePlace.name} 추가`, exact: true }).click()
-  await page.getByRole('button', { name: '순서·시간 설정', exact: true }).click()
-  await page.getByLabel('여행 날짜', { exact: true }).fill('2026-11-01')
-  await page.getByLabel('시작시간', { exact: true }).fill('09:00')
-  await page.getByLabel('종료시간', { exact: true }).fill('12:00')
-  await page.getByLabel('사진 촬영 20분').check()
-  await page.getByRole('spinbutton', { name: `${fixturePlace.name} 머무를 시간 (분)` }).fill('100')
-}
-async function login(page: Page) {
-  await page.route('**/api/user/login', (route) => route.fulfill({ json: { accessToken: 'synthetic-test-token', nickname: '테스트 여행자' } }))
-  const dialog = page.getByRole('dialog')
-  await dialog.getByLabel('이메일', { exact: true }).fill('fixture@example.test')
-  await dialog.getByLabel('비밀번호', { exact: true }).fill('synthetic-password')
-  await dialog.getByRole('button', { name: '로그인하고 진단하기', exact: true }).click()
-}
-async function diagnose(page: Page, result = diagnosisFixture()) {
-  await page.route(endpoint, (route) => route.fulfill({ json: result }))
-  await openPlanner(page)
-  await page.getByRole('button', { name: '진단하기', exact: true }).click()
-  await login(page)
-  await expect(page.getByRole('heading', { name: '일정 진단 결과', exact: true })).toBeFocused()
-}
-
 test('contract rejects missing verification, invalid timing, geometry, targets and contradictory safety claims', () => {
   expect(parseDiagnosis(diagnosisFixture(), [fixturePlace.id]).decision).toBe('POSSIBLE')
   expect(parseDiagnosis(unknownDiagnosis(), [fixturePlace.id]).verificationStatus).toBe('UNKNOWN')
@@ -115,7 +87,7 @@ test('login submits the V2 contract once and pairs possible with partial, timeli
   await expect(page.getByTestId('diagnosis-verdict')).toContainText('일부 확인')
   await expect(page.getByRole('heading', { name: '확인하지 못한 항목', exact: true })).toBeVisible()
   await expect(page.getByText('15분 17초', { exact: true })).toHaveCount(2)
-  await expect(page.getByTestId('route-line')).toHaveAttribute('data-segment-id', 'segment-0')
+  await expect(page.frameLocator('iframe[title="'+String.fromCharCode(51068,51221,32,44221,47196,32,51648,46020)+'"]').locator('.place-label')).toHaveCount(2)
   expect(calls).toBe(1)
   expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0])
   expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([])
@@ -128,7 +100,7 @@ test('unknown travel has no invented totals, zero time or route', async ({ page 
   await expect(page.getByTestId('diagnosis-verdict')).toContainText('아직 가능 여부를 판단할 수 없어요')
   await expect(page.getByTestId('verification-status')).toContainText('확인 불가')
   await expect(page.getByRole('heading', { name: '확인된 이동 경로가 없어요' })).toBeVisible()
-  await expect(page.getByTestId('route-line')).toHaveCount(0)
+  await expect(page.locator('iframe')).toHaveCount(0)
   await expect(page.locator('.diagnosis-metrics')).toContainText('계산 불가')
   await expect(page.locator('.diagnosis-metrics')).not.toContainText('0분')
   await page.screenshot({ path: `test-results/${info.project.name}-diagnosis-unknown-fixture.png`, fullPage: true })
