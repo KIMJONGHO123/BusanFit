@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { parseDiagnosis } from '../src/features/diagnosis/diagnosis'
+import { formatDuration, parseDiagnosis } from '../src/features/diagnosis/diagnosis'
 
 test.skip(process.env.BUSANFIT_LIVE_WEB_DIAGNOSIS !== '1', 'Requires the isolated H2 server, explicit real API enablement and separate Vite port')
 
@@ -45,6 +45,11 @@ test('real browser signup, login, TourAPI search and TMAP diagnosis display part
   await expect(map.locator('.place-label').filter({ hasText: '부산 감천문화마을' })).toHaveCount(1)
   await map.getByRole('button', { name: '전체 경로', exact: true }).click()
   await expect.poll(() => map.locator('#map img').evaluateAll((images) => { const visible = images.filter((img) => { const r = img.getBoundingClientRect(); return r.width >= 256 && r.right > 0 && r.left < innerWidth && r.bottom > 0 && r.top < innerHeight }); return visible.length > 0 && visible.every((img) => (img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth >= 256) }), { timeout: 20000 }).toBe(true)
+  const number = map.locator('.place-marker[data-order="1"] .place-number')
+  if (info.project.name === 'mobile') await number.tap(); else await number.click()
+  await expect(page.getByTestId('route-leg-duration')).toHaveText(formatDuration(result.schedule.segments[0].route.value!.seconds))
+  await expect(map.locator('.place-marker[data-order="1"]')).toHaveAttribute('data-selected', 'true')
+  await page.locator('section[aria-labelledby="route-heading"]').screenshot({ path: `test-results/${info.project.name}-diagnosis-live-leg.png` })
   await page.locator('.route-map-shell').screenshot({ path: `test-results/${info.project.name}-diagnosis-live-map.png` })
   await page.screenshot({ path: `test-results/${info.project.name}-diagnosis-live-partial.png`, fullPage: true })
   await page.getByRole('button', { name: '일정 수정하기', exact: true }).click()
@@ -59,6 +64,7 @@ test('real browser signup, login, TourAPI search and TMAP diagnosis display part
   expect(adjusted.schedule.totalStaySeconds).toBe(36000)
   await expect(page.getByTestId('diagnosis-verdict')).toContainText('일정을 조금 조정해 주세요')
   await expect(page.getByTestId('diagnosis-verdict')).toContainText('일부 확인')
+  await expect(page.getByTestId('route-leg-duration')).toHaveCount(0)
   await page.screenshot({ path: `test-results/${info.project.name}-diagnosis-live-overrun.png`, fullPage: true })
   await info.attach('live-diagnosis-summary', { contentType: 'application/json', body: JSON.stringify({ placeId: 'tourapi-1997221', firstDecision: result.decision, verification: result.verificationStatus, travelSeconds: result.schedule.totalTravelSeconds, totalStaySeconds: result.schedule.totalStaySeconds, requiredSeconds: result.schedule.requiredSeconds, overrunDecision: adjusted.decision }) })
 })
