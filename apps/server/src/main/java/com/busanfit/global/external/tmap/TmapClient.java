@@ -116,7 +116,7 @@ public class TmapClient {
             int totalDistanceMeters = readRequiredInt(propertiesNode, "totalDistance");
             List<TmapRouteCoordinate> coordinates = readRouteCoordinates(rawResponse);
 
-            // TMAP totalTime은 초 단위입니다. 일정 계산용 분 값은 올림으로 만들어 초 단위 손실을 막습니다.
+            // 분 값은 V1 호환용입니다. V2 진단은 구간별 올림 없이 totalTimeSeconds를 사용합니다.
             int totalTimeMinutes = (int) Math.ceil(totalTimeSeconds / 60.0);
 
             return new TmapCarRouteResult(
@@ -152,7 +152,7 @@ public class TmapClient {
 
     private int readRequiredInt(JsonNode propertiesNode, String fieldName) {
         JsonNode value = propertiesNode.get(fieldName);
-        if (value == null || !value.canConvertToInt()) {
+        if (value == null || !value.isIntegralNumber() || !value.canConvertToInt() || value.intValue() < 0) {
             throw new TmapApiException("TMAP 응답 필드가 숫자가 아닙니다: " + fieldName);
         }
 
@@ -196,13 +196,13 @@ public class TmapClient {
 
         JsonNode longitudeNode = coordinatePair.get(0);
         JsonNode latitudeNode = coordinatePair.get(1);
-        if (longitudeNode == null || latitudeNode == null) {
+        if (longitudeNode == null || latitudeNode == null || !longitudeNode.isNumber() || !latitudeNode.isNumber()) {
             return;
         }
 
         double longitude = longitudeNode.asDouble();
         double latitude = latitudeNode.asDouble();
-        if (!Double.isFinite(latitude) || !Double.isFinite(longitude)) {
+        if (!Double.isFinite(latitude) || !Double.isFinite(longitude) || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
             return;
         }
 

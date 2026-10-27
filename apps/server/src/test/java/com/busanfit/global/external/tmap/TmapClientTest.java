@@ -14,6 +14,8 @@ import com.busanfit.global.external.tmap.dto.TmapCarRouteResult;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -166,5 +168,14 @@ class TmapClientTest {
         assertThatThrownBy(() -> tmapClient.getCarRoute(120.0, 129.0414, 35.0975, 129.0106))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("출발지 위도 값이 올바르지 않습니다.");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"-1", "1.5", "\"60\"", "2147483648", "null"})
+    void fractionalNegativeOrNonIntegerSummaryIsNeverConvertedToValidSeconds(String seconds) {
+        mockServer.expect(request -> {}).andRespond(withSuccess(
+                "{\"features\":[{\"properties\":{\"totalDistance\":100,\"totalTime\":" + seconds + "}}]}",
+                MediaType.APPLICATION_JSON));
+        assertThatThrownBy(() -> tmapClient.getCarRoute(35, 129, 36, 129)).isInstanceOf(TmapApiException.class);
     }
 }

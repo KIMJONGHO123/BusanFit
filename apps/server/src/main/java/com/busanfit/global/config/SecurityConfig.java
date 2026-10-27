@@ -2,7 +2,7 @@ package com.busanfit.global.config;
 
 import com.busanfit.global.security.JwtAuthenticationFilter;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -20,10 +20,17 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final List<String> allowedOrigins;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+            @Value("${app.cors.allowed-origins:http://localhost:8081,http://127.0.0.1:5173,http://localhost:5173}")
+            List<String> allowedOrigins) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.allowedOrigins = List.copyOf(allowedOrigins);
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -65,10 +72,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Expo 웹 개발 서버에서 Spring Boot API를 호출할 수 있게 허용합니다.
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:8081"
-        ));
+        // Existing Expo and Vite development clients use explicit origins; no wildcard credentials.
+        configuration.setAllowedOrigins(allowedOrigins);
 
         configuration.setAllowedMethods(List.of(
                 "GET",

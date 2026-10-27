@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test'
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
-  use: { baseURL: 'http://127.0.0.1:5173', channel: 'chrome' },
+  use: { baseURL: process.env.BUSANFIT_WEB_BASE_URL || 'http://127.0.0.1:5173', channel: 'chrome' },
   projects: [
     { name: 'desktop', use: { viewport: { width: 1440, height: 1000 } } },
     {
@@ -13,7 +13,7 @@ export default defineConfig({
   ],
   webServer: {
     command: 'npm run dev',
-    url: 'http://127.0.0.1:5173',
+    url: process.env.BUSANFIT_WEB_BASE_URL || 'http://127.0.0.1:5173',
     reuseExistingServer: true,
   },
 })

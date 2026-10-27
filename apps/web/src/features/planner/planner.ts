@@ -124,7 +124,7 @@ export function validateDraft(trip: TripDraft, stops: StopDraft[], policy: Activ
   return errors
 }
 
-/** Future V2 request input only. Does not compute or submit a diagnosis. */
+/** Builds the V2 request without computing any diagnosis in the browser. */
 export function buildDiagnosisInput(trip: TripDraft, stops: StopDraft[], policy: ActivityPolicy[]) {
   if (validateDraft(trip, stops, policy).length) throw new Error('일정 입력을 확인해 주세요.')
   return {

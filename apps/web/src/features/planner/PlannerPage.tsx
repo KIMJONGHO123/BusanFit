@@ -3,15 +3,22 @@ import type { Dispatch, SetStateAction } from 'react'
 import { Icon } from '../../components/Icon'
 import { PlaceImage } from '../places/PlaceImage'
 import { DepartureSearch } from './DepartureSearch'
-import { activitySeconds, activitySummary, fillStayFromActivities, minutesToSeconds, moveStop, parseActivityPolicy, toggleActivity, validateDraft } from './planner'
+import { activitySeconds, activitySummary, buildDiagnosisInput, fillStayFromActivities, minutesToSeconds, moveStop, parseActivityPolicy, toggleActivity, validateDraft } from './planner'
 import type { ActivityPolicy, StopDraft, TripDraft } from './planner'
+import { AuthDialog } from '../auth/AuthDialog'
+import type { Session } from '../auth/AuthDialog'
+import { parseDiagnosis } from '../diagnosis/diagnosis'
+import type { Diagnosis, DiagnosisSnapshot } from '../diagnosis/diagnosis'
 
-export function PlannerPage({ stops, setStops, trip, setTrip, onBack }: {
+export function PlannerPage({ stops, setStops, trip, setTrip, onBack, session, setSession, onDiagnosed }: {
   stops: StopDraft[]
   setStops: Dispatch<SetStateAction<StopDraft[]>>
   trip: TripDraft
   setTrip: Dispatch<SetStateAction<TripDraft>>
   onBack: () => void
+  session: Session | null
+  setSession: Dispatch<SetStateAction<Session | null>>
+  onDiagnosed: (result: Diagnosis, snapshot: DiagnosisSnapshot) => void
 }) {
   const [policy, setPolicy] = useState<ActivityPolicy[] | null>(null)
   const [policyState, setPolicyState] = useState<'loading' | 'success' | 'error'>('loading')
@@ -19,6 +26,13 @@ export function PlannerPage({ stops, setStops, trip, setTrip, onBack }: {
   const [checked, setChecked] = useState(false)
   const [announcement, setAnnouncement] = useState('')
   const checkResult = useRef<HTMLDivElement>(null)
+  const [authOpen, setAuthOpen] = useState(false)
+  const [expired, setExpired] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [requestError, setRequestError] = useState('')
+  const activeRequest = useRef<AbortController | null>(null)
+  const pending = useRef<{ input: ReturnType<typeof buildDiagnosisInput>; snapshot: DiagnosisSnapshot } | null>(null)
+  useEffect(() => () => { activeRequest.current?.abort(); activeRequest.current = null }, [])
   useEffect(() => {
     const controller = new AbortController()
     let disposed = false
@@ -33,11 +47,43 @@ export function PlannerPage({ stops, setStops, trip, setTrip, onBack }: {
     return () => { disposed = true; window.clearTimeout(timer); controller.abort() }
   }, [retry])
   const errors = validateDraft(trip, stops, policy)
+  function checkInput() { setChecked(true); window.requestAnimationFrame(() => checkResult.current?.focus()) }
+  function diagnose() {
+    if (activeRequest.current) return
+    setRequestError('')
+    if (errors.length || !policy) { checkInput(); return }
+    pending.current = { input: buildDiagnosisInput(trip, stops, policy), snapshot: structuredClone({ trip, stops }) }
+    setChecked(false)
+    if (!session) { setExpired(false); setAuthOpen(true); return }
+    void submitDiagnosis(session)
+  }
+  async function submitDiagnosis(currentSession: Session) {
+    if (activeRequest.current || !pending.current) return
+    const captured = pending.current
+    const controller = new AbortController()
+    activeRequest.current = controller
+    const timeout = window.setTimeout(() => controller.abort(), 120000)
+    setSubmitting(true); setRequestError('')
+    try {
+      const response = await fetch('/api/v2/planner/diagnose', { method: 'POST', signal: controller.signal,
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json', Authorization: `Bearer ${currentSession.accessToken}` }, body: JSON.stringify(captured.input) })
+      if (response.status === 401) { setSession(null); setExpired(true); setAuthOpen(true); return }
+      if (!response.ok) throw new Error('진단 요청 실패')
+      const result = parseDiagnosis(await response.json(), captured.input.stops.map((s) => s.placeId))
+      if (!controller.signal.aborted) onDiagnosed(result, captured.snapshot)
+    } catch {
+      if (activeRequest.current === controller) { setRequestError('진단을 완료하지 못했어요. 입력은 유지됩니다. 서버 연결과 입력 내용을 확인한 뒤 다시 시도해 주세요.'); window.requestAnimationFrame(() => checkResult.current?.focus()) }
+    } finally {
+      window.clearTimeout(timeout)
+      if (activeRequest.current === controller) { activeRequest.current = null; setSubmitting(false) }
+    }
+  }
   function updateStop(id: string, update: (stop: StopDraft) => StopDraft) {
     setStops((current) => current.map((s) => s.place.id === id ? update(s) : s))
     setChecked(false)
+    setRequestError('')
   }
-  function updateTrip(update: Partial<TripDraft>) { setTrip((current) => ({ ...current, ...update })); setChecked(false) }
+  function updateTrip(update: Partial<TripDraft>) { setTrip((current) => ({ ...current, ...update })); setChecked(false); setRequestError('') }
   const totalStay = stops.reduce<number | null>((total, stop) => {
     const seconds = minutesToSeconds(stop.stayMinutes)
     if (total === null || seconds === null || !Number.isSafeInteger(total + seconds)) return null
@@ -47,7 +93,7 @@ export function PlannerPage({ stops, setStops, trip, setTrip, onBack }: {
     <a className="skip-link" href="#planner-main">본문으로 건너뛰기</a>
     <header className="site-header"><div className="header-inner">
       <button className="brand brand-button" onClick={onBack} aria-label="부산핏 장소 선택으로 돌아가기"><span className="brand-mark"><Icon name="check" /></span>busanfit<span className="brand-dot">.</span></button>
-      <span className="header-context">여행 일정 만들기</span><span className="header-note">계획을, 가능한 여행으로.</span>
+      <span className="header-context">여행 일정 만들기</span>{session ? <div className="session-control"><span>{session.nickname}님</span><button type="button" disabled={submitting} onClick={() => setSession(null)}>로그아웃</button></div> : <span className="header-note">계획을, 가능한 여행으로.</span>}
     </div></header>
     <main id="planner-main" className="workspace planner-workspace">
       <ol className="steps" aria-label="일정 만들기 단계">
@@ -56,7 +102,8 @@ export function PlannerPage({ stops, setStops, trip, setTrip, onBack }: {
       <div className="page-heading"><div><p className="eyebrow">나만의 속도로, 하루 구성하기</p>
         <h1 tabIndex={-1}>어떤 하루를 보내고 싶으세요?</h1><p>방문 순서를 정하고, 장소마다 하고 싶은 활동과 머무를 시간을 담아보세요.</p></div>
       </div>
-      <form noValidate onSubmit={(event) => { event.preventDefault(); setChecked(true); window.requestAnimationFrame(() => checkResult.current?.focus()) }}>
+      <form noValidate aria-busy={submitting} onSubmit={(event) => { event.preventDefault(); diagnose() }}>
+        <fieldset className="plain-fieldset" disabled={submitting}>
         <div className="workspace-grid planner-grid">
           <section aria-labelledby="itinerary-heading" className="itinerary-area">
             <div className="itinerary-heading"><div><h2 id="itinerary-heading">방문 순서 <span>{stops.length}</span></h2><p>위에서 아래로 방문해요. 화살표로 순서를 바꿀 수 있어요.</p></div>
@@ -122,18 +169,24 @@ export function PlannerPage({ stops, setStops, trip, setTrip, onBack }: {
             </section>
             <section className="planner-panel summary-panel"><h2>입력한 일정</h2><dl><div><dt>방문 장소</dt><dd>{stops.length}곳</dd></div><div><dt>머무를 시간 합계</dt><dd>{totalStay === null ? '입력 필요' : `${totalStay / 60}분`}</dd></div><div><dt>이동·대기시간</dt><dd>진단 후 확인</dd></div></dl>
               <p className="field-help">머무를 시간 합계에는 활동이 포함돼요. 이동·대기시간이 확인되지 않아 여행 가능 여부는 아직 알 수 없어요.</p>
-              <button type="submit" className="button primary next-button">입력 확인 <Icon name="check" /></button>
-              <p className="field-help">진단 기능은 준비 중이에요. 지금은 입력 내용만 확인할 수 있어요.</p>
+              <button type="submit" className="button primary next-button">{submitting ? '일정을 진단하고 있어요…' : '진단하기'} <Icon name="arrow" /></button>
+              <button type="button" className="button input-check-button" onClick={checkInput}>입력 확인</button>
+              <p className="field-help">이동시간을 조회해 가능 여부를 확인해요. 운영시간·날씨 등 미확인 정보도 함께 표시합니다. {!session && '진단 시 로그인이 필요해요.'}</p>
+              {submitting && <p className="field-help" role="status">실제 이동 경로와 시간을 확인하고 있어요. 장소 수에 따라 시간이 걸릴 수 있어요.</p>}
             </section>
           </aside>
         </div>
-        {checked && <div ref={checkResult} className="input-check planner-panel" tabIndex={-1} role="status">
-          {errors.length ? <><h2>입력을 조금 더 확인해 주세요</h2><ul>{errors.map((error, index) => <li key={index}>{error}</li>)}</ul></> : <><h2>입력 형식을 확인했어요</h2><p>방문 가능 여부를 진단한 결과는 아닙니다. 일정은 현재 브라우저 메모리에만 유지되며 새로고침하면 초기화돼요.</p></>}
+        </fieldset>
+        {(checked || requestError) && <div ref={checkResult} className="input-check planner-panel" tabIndex={-1} role={requestError || errors.length ? 'alert' : 'status'}>
+          {requestError ? <><h2>진단을 완료하지 못했어요</h2><p>{requestError}</p></> :
+          errors.length ? <><h2>입력을 조금 더 확인해 주세요</h2><ul>{errors.map((error, index) => <li key={index}>{error}</li>)}</ul></> : <><h2>입력 형식을 확인했어요</h2><p>방문 가능 여부를 진단한 결과는 아닙니다. 일정은 현재 브라우저 메모리에만 유지되며 새로고침하면 초기화돼요.</p></>
+          }
         </div>}
       </form>
       <div className="planner-bottom"><button type="button" className="button" onClick={onBack}>← 장소 선택으로 돌아가기</button><p>화면을 오가도 입력은 유지돼요. 새로고침하면 초기화됩니다.</p></div>
       <footer className="page-footer"><span>busanfit.</span><p>가고 싶은 곳을 연결하고, 가능한 하루를 만들어요.</p></footer>
       <div className="sr-only" role="status">{announcement}</div>
     </main>
+    {authOpen && <AuthDialog expired={expired} onClose={() => { setAuthOpen(false); window.requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('.summary-panel button[type="submit"]')?.focus()) }} onAuthenticated={(nextSession) => { setSession(nextSession); setAuthOpen(false); void submitDiagnosis(nextSession) }} />}
   </>
 }
