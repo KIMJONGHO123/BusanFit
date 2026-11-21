@@ -49,6 +49,7 @@ checkstyle {
 
 tasks.withType(Checkstyle).configureEach {
 	include 'com/busanfit/diagnosis/**/*.java'
+	include 'com/busanfit/place/ingest/**/*.java'
 }
 
 tasks.register('diagnosisWebTestServer', JavaExec) {
@@ -57,4 +58,13 @@ tasks.register('diagnosisWebTestServer', JavaExec) {
 	dependsOn testClasses
 	classpath = sourceSets.test.runtimeClasspath
 	mainClass = 'com.busanfit.diagnosis.WebDiagnosisTestServer'
+}
+
+tasks.register('placeImport', JavaExec) {
+	group = 'application'
+	description = 'Explicit place source import. Defaults to read-only inspect; use -PplaceImportMode=import to collect and persist.'
+	dependsOn classes
+	classpath = sourceSets.main.runtimeClasspath
+	mainClass = 'com.busanfit.place.ingest.PlaceImportMain'
+	args providers.gradleProperty('placeImportMode').orElse('inspect').get()
 }
