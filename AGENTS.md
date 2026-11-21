@@ -265,6 +265,8 @@ Commit / Merge를 진행한다.
 
 ## 10. Evidence
 
+커밋한 Task의 Evidence는 해당 커밋 시점의 기록으로 보존한다. 이후 같은 기능의 수정·보완·검증도 다음 미사용 Task 번호로 새 Evidence를 작성하고, 이전 Task가 필요하면 링크로 참조한다. 번호를 정할 때는 현재 작성 중인 미커밋 Evidence도 포함한다.
+
 모든 의미 있는 변경은 `docs/V2/docs/evidence/` 아래에 기록한다.
 
 형식은 `docs/V2/docs/evidence/TEMPLATE.md`를 따른다.
