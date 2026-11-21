@@ -1,10 +1,53 @@
 import { test, expect } from '@playwright/test'
 import { parsePlaces } from '../src/features/places/places'
 import { parseActivityPolicy } from '../src/features/planner/planner'
+import type { Page } from '@playwright/test'
 
 // Opt-in only: real running Spring Boot + DB + TourAPI credentials are required.
 // No response interception or fixture fallback is used in this file.
 test.skip(process.env.BUSANFIT_LIVE_TOURAPI !== '1', 'Requires explicitly enabled real TourAPI environment')
+
+async function verifyDetail(page: Page, place: { id: string; name: string }) {
+  const completed = page.waitForResponse(async res =>
+    new URL(res.url()).pathname === `/api/places/${place.id}/detail` && await res.finished() === null)
+  await page.getByRole('button', { name: `${place.name} 상세 보기`, exact: true }).click()
+  const response = await completed
+  expect(response.status()).toBe(200)
+  const detail = await response.json()
+  if (detail.status === 'NOT_COLLECTED' || detail.status === 'EMPTY') {
+    const message = detail.status === 'NOT_COLLECTED'
+      ? '아직 수집한 상세정보가 없습니다.' : '수집했지만 표시할 값이 없습니다.'
+    await expect(page.getByRole('dialog').getByText(message, { exact: true })).toBeVisible()
+    expect(detail.fields.filter((field: { text: string }) => field.text.trim())).toHaveLength(0)
+    return []
+  }
+  expect(detail.status).toBe('AVAILABLE')
+  const visible = detail.fields.filter((f: { text: string }) => f.text.trim())
+  expect(visible.length).toBeGreaterThan(0)
+  const rows = page.locator('dialog .visit-details div').filter({ has: page.locator('dd span') })
+  await expect(rows).toHaveCount(visible.length)
+  for (const [index, field] of visible.entries()) {
+    const row = rows.nth(index)
+    await expect(row.locator('dt')).toHaveText(field.label)
+    await expect(row.locator('dd span')).toHaveText(field.text)
+    await expect(row.locator('small').first()).toContainText(field.source)
+    expect(Date.parse(field.checkedAt)).toBeGreaterThan(0)
+    await expect(row.locator('time')).toHaveAttribute('datetime', field.checkedAt)
+    const koreanTime = await page.evaluate((timestamp: string) =>
+      new Date(timestamp).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }), field.checkedAt)
+    await expect(row.locator('time')).toHaveText(`${koreanTime} 수집 (한국시간)`)
+    await expect(row.getByText('출처별 안내가 다릅니다.', { exact: true })).toHaveCount(field.differs ? 1 : 0)
+  }
+  return visible.map((field: { source: string }) => field.source)
+}
+
+test('F1963 stored detail displays both real providers and their observation times', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('textbox').fill('F1963')
+  await page.getByRole('textbox').press('Enter')
+  const sources = await verifyDetail(page, { name: 'F1963', id: 'tourapi-2456767' })
+  expect(sources).toEqual(expect.arrayContaining(['한국관광공사', '부산광역시']))
+})
 
 test('real TourAPI search, selection and itinerary editing preserve returned places', async ({ page }, info) => {
   test.setTimeout(90_000)
@@ -25,9 +68,8 @@ test('real TourAPI search, selection and itinerary editing preserve returned pla
   expect(first.name).toContain('해운대')
   expect(first.address).toContain('부산')
   await expect(page.locator('.place-list .place-row')).toHaveCount(places.length)
-  await page.getByRole('button', { name: `${first.name} 상세 보기`, exact: true }).click()
+  await verifyDetail(page, first)
   await expect(page.getByRole('dialog')).toContainText(first.name)
-  await expect(page.getByRole('dialog')).toContainText('정보 확인 불가')
   await expect(page.getByRole('dialog')).toContainText('근거 정보 없음')
   await page.getByRole('button', { name: '선택한 장소에 추가', exact: true }).click()
   await page.getByRole('button', { name: '장소 정보 닫기' }).click()

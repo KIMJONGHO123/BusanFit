@@ -188,6 +188,52 @@ class PlaceImportMySqlTest {
     }
 
     @Test
+    void initialLinkScriptRollsBackBothInsertsEvenIfClientContinuesAfterError() throws Exception {
+        sql("""
+                UPDATE tourapi_place SET content_id='2456767',name='F1963',
+                matching_hash='d27e5a548717df47d555948d73a7278a4d51cf2a9cc01b6a75ddc020a2b17bef'
+                WHERE content_id='1'
+                """);
+        sql("""
+                UPDATE busan_attraction SET uc_seq='372',name='F1963',
+                matching_hash='8ceb4320b5eb8487d359f4aa98f120335c20c1dd4b0a78a0be0353708d5c75ab'
+                WHERE uc_seq='11'
+                """);
+        String script;
+        try (var resource = getClass().getResourceAsStream("/db/manual/TASK017-connect-place-details.sql")) {
+            script = new String(java.util.Objects.requireNonNull(resource).readAllBytes(), StandardCharsets.UTF_8);
+        }
+        // JDBC sends complete stored routines directly; DELIMITER is mysql client syntax.
+        var statements = script.lines().filter(line -> !line.startsWith("DELIMITER"))
+                .collect(java.util.stream.Collectors.joining("\n")).split(java.util.regex.Pattern.quote("$$"));
+        sql("CREATE TRIGGER reject_link_review BEFORE INSERT ON place_link_review FOR EACH ROW "
+                + "SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='injected review failure'");
+        boolean reachedCall = false;
+        for (var statement : statements) {
+            if (statement.stripLeading().startsWith("CALL ")) {
+                assertThatThrownBy(() -> sql(statement)).isInstanceOf(SQLException.class)
+                        .hasMessageContaining("injected review failure");
+                reachedCall = true;
+                sql("COMMIT");
+            } else if (!statement.isBlank()) {
+                sql(statement);
+            }
+        }
+        assertThat(reachedCall).isTrue();
+        assertThat(number("SELECT COUNT(*) FROM place_link")).isZero();
+        assertThat(number("SELECT COUNT(*) FROM place_link_review")).isZero();
+        assertThat(number("SELECT IS_FREE_LOCK('busanfit_task016_import')")).isEqualTo(1);
+        sql("DROP TRIGGER reject_link_review");
+        for (var statement : statements) {
+            if (!statement.isBlank()) {
+                sql(statement);
+            }
+        }
+        assertThat(number("SELECT COUNT(*) FROM place_link")).isEqualTo(1);
+        assertThat(number("SELECT COUNT(*) FROM place_link_review")).isEqualTo(1);
+    }
+
+    @Test
     void linkAndApprovalHistoryRollbackTogetherWhenHistoryInsertFails() throws Exception {
         connection.setAutoCommit(false);
         try {

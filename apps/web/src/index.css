@@ -718,6 +718,10 @@ h1 {
   line-height: 1.8;
   color: #58616a;
 }
+.dialog-content dl.visit-details div { display: grid; grid-template-columns: minmax(68px, 25%) minmax(0, 1fr); align-items: start; gap: 12px; }
+.visit-details dt { overflow-wrap: anywhere; }
+.visit-details dd { white-space: pre-line; overflow-wrap: anywhere; line-height: 1.6; }
+.visit-details small { display: block; margin-top: 3px; }
 .source-label {
   font-size: 10px;
   color: var(--muted);

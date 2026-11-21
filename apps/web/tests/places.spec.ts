@@ -116,6 +116,41 @@ test('initial screen is honest, responsive and does not fetch invented results',
   })
 })
 
+for (const [status, message] of [
+  ['NOT_COLLECTED', '아직 수집한 상세정보가 없습니다.'],
+  ['EMPTY', '수집했지만 표시할 값이 없습니다.'],
+  ['error', '방문 정보를 불러오지 못했습니다.'],
+]) {
+  test(`detail explains ${status}`, async ({ page }) => {
+    await page.route(endpoint, route => route.fulfill({ json: [place] }))
+    await page.route('**/api/places/*/detail?*', route => route.fulfill({
+      status: status === 'error' ? 503 : 200, json: { status, fields: [] },
+    }))
+    await page.goto('/')
+    await page.getByRole('button', { name: '해운대', exact: true }).click()
+    await page.getByRole('button', { name: '테스트 관광지 상세 보기' }).click()
+    await expect(page.getByRole('dialog').getByText(message)).toBeVisible()
+    await page.getByRole('button', { name: '선택한 장소에 추가', exact: true }).click()
+    await page.getByRole('button', { name: '장소 정보 닫기' }).click()
+    await expect(page.getByRole('button', { name: '테스트 관광지 선택됨', exact: true })).toBeDisabled()
+  })
+}
+
+test('detail shows each provider next to its own value', async ({ page }) => {
+  await page.route(endpoint, route => route.fulfill({ json: [place] }))
+  const observation = { checkedAt: '2026-11-03T01:00:00Z', state: 'VALUE', differs: false }
+  await page.route('**/api/places/*/detail?*', route => route.fulfill({ json: { status: 'AVAILABLE', fields: [
+    { ...observation, label: '주차', text: '유료 주차', source: '한국관광공사' },
+    { ...observation, label: '교통편', text: '역에서 도보 이동', source: '부산광역시' },
+  ] } }))
+  await page.goto('/')
+  await page.getByRole('button', { name: '해운대', exact: true }).click()
+  await page.getByRole('button', { name: '테스트 관광지 상세 보기' }).click()
+  const detail = page.getByRole('dialog')
+  await expect(detail.locator('dd').filter({ hasText: '유료 주차' })).toContainText('한국관광공사')
+  await expect(detail.locator('dd').filter({ hasText: '역에서 도보 이동' })).toContainText('부산광역시')
+})
+
 test('search, detail, selection across searches, duplicate protection and removal', async ({
   page,
 }, info) => {

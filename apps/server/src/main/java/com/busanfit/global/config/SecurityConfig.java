@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/planner/activity-policy").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/planner/activity-policy", "/api/places/*/detail").permitAll()
                         // 회원가입과 로그인은 토큰이 아직 없는 상태에서 호출해야 하므로 공개합니다.
                         .requestMatchers(
                                 "/api/user/signup",

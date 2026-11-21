@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Icon } from '../../components/Icon'
 import { PlaceImage } from './PlaceImage'
+import { VisitDetails } from './VisitDetails'
 import { searchPlaces } from './places'
 import type { Place } from './places'
 
@@ -456,21 +457,12 @@ export function PlaceSearchPage({ selected, onAdd, onRemove, onNext }: {
                 <Icon name="pin" />
                 {detail.address || '주소 정보 없음'}
               </p>
-              <dl>
-                <div>
-                  <dt>운영시간</dt>
-                  <dd>정보 확인 불가</dd>
-                </div>
-                <div>
-                  <dt>장소별 권장 체류시간</dt>
-                  <dd>근거 정보 없음</dd>
-                </div>
-              </dl>
+              <VisitDetails key={detail.id} place={detail} />
               <p className="detail-note">
                 현재 제공된 정보로는 운영 여부나 방문 가능 여부를 판단할 수
                 없어요.
               </p>
-              <p className="source-label">장소 정보 · 한국관광공사</p>
+              <p className="source-label">장소 기본정보 · 한국관광공사</p>
               <button
                 className="button primary"
                 disabled={isSelected(detail)}
